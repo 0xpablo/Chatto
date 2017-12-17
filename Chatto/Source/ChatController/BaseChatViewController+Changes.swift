@@ -41,7 +41,7 @@ extension BaseChatViewController: ChatDataSourceDelegateProtocol {
             self.updateQueue.flushQueue()
         }
 
-        self.updateQueue.addTask({ [weak self] (completion) -> () in
+        self.updateQueue.addTask({ [weak self] (completion) -> Void in
             guard let sSelf = self else { return }
 
             let oldItems = sSelf.chatItemCompanionCollection
@@ -57,7 +57,7 @@ extension BaseChatViewController: ChatDataSourceDelegateProtocol {
 
     public func enqueueMessageCountReductionIfNeeded() {
         guard let preferredMaxMessageCount = self.constants.preferredMaxMessageCount, (self.chatDataSource?.chatItems.count ?? 0) > preferredMaxMessageCount else { return }
-        self.updateQueue.addTask { [weak self] (completion) -> () in
+        self.updateQueue.addTask { [weak self] (completion) -> Void in
             guard let sSelf = self else { return }
             sSelf.chatDataSource?.adjustNumberOfMessages(preferredMaxCount: sSelf.constants.preferredMaxMessageCountAdjustment, focusPosition: sSelf.focusPosition, completion: { (didAdjust) -> Void in
                 guard didAdjust, let sSelf = self else {
@@ -132,9 +132,9 @@ extension BaseChatViewController: ChatDataSourceDelegateProtocol {
     }
 
     func performBatchUpdates(updateModelClosure: @escaping () -> Void,
-                                                changes: CollectionChanges,
-                                                updateType: UpdateType,
-                                                completion: @escaping () -> Void) {
+                             changes: CollectionChanges,
+                             updateType: UpdateType,
+                             completion: @escaping () -> Void) {
 
         let usesBatchUpdates: Bool
         do { // Recover from too fast updates...
@@ -190,14 +190,14 @@ extension BaseChatViewController: ChatDataSourceDelegateProtocol {
                 self.unfinishedBatchUpdatesCount += 1
                 self.collectionView.performBatchUpdates({ () -> Void in
                     updateModelClosure()
-                    self.updateVisibleCells(changes) // For instace, to support removal of tails
+                    self.updateVisibleCells(changes) // For instance, to support removal of tails
 
                     self.collectionView.deleteItems(at: Array(changes.deletedIndexPaths))
                     self.collectionView.insertItems(at: Array(changes.insertedIndexPaths))
                     for move in changes.movedIndexPaths {
                         self.collectionView.moveItem(at: move.indexPathOld, to: move.indexPathNew)
                     }
-                }) { [weak self] (finished) -> Void in
+                }) { [weak self] (_) -> Void in
                     defer { myCompletion() }
                     guard let sSelf = self else { return }
                     sSelf.unfinishedBatchUpdatesCount -= 1
@@ -232,7 +232,7 @@ extension BaseChatViewController: ChatDataSourceDelegateProtocol {
         let performInBackground = updateType != .firstLoad
 
         self.autoLoadingEnabled = false
-        let perfomBatchUpdates: (_ changes: CollectionChanges, _ updateModelClosure: @escaping () -> Void) -> ()  = { [weak self] (changes, updateModelClosure) in
+        let perfomBatchUpdates: (_ changes: CollectionChanges, _ updateModelClosure: @escaping () -> Void) -> Void  = { [weak self] (changes, updateModelClosure) in
             self?.performBatchUpdates(
                 updateModelClosure: updateModelClosure,
                 changes: changes,
@@ -301,7 +301,7 @@ extension BaseChatViewController: ChatDataSourceDelegateProtocol {
             let layoutData = intermediateLayoutData.map { (intermediateLayoutData: IntermediateItemLayoutData) -> ItemLayoutData in
                 return (height: intermediateLayoutData.height!, bottomMargin: intermediateLayoutData.bottomMargin)
             }
-            return ChatCollectionViewLayoutModel.createModel(self.collectionView.bounds.width, itemsLayoutData: layoutData)
+            return ChatCollectionViewLayoutModel.createModel(collectionViewWidth, itemsLayoutData: layoutData)
         }
 
         let isInbackground = !Thread.isMainThread

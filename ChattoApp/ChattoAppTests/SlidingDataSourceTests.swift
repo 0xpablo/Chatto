@@ -68,13 +68,12 @@ class SlidingDataSourceTests: XCTestCase {
         XCTAssertFalse(dataSource.hasMore())
     }
 
-
     func testThat_LoadPreviousAddsElementsOnTheTop() {
         var uid = 0
         let expectedArray = (0..<100).reversed().map { (id) -> String in
             return "\(id)"
         }
-        let dataSource = SlidingDataSource(count: 10000, pageSize: 50) { (id) -> String in
+        let dataSource = SlidingDataSource(count: 10000, pageSize: 50) { (_) -> String in
             defer { uid += 1 }
             return "\(uid)"
         }
@@ -92,7 +91,7 @@ class SlidingDataSourceTests: XCTestCase {
             return "\(id)"
         }
 
-        let dataSource = SlidingDataSource(count: 10000, pageSize: 50) { (id) -> String in
+        let dataSource = SlidingDataSource(count: 10000, pageSize: 50) { (_) -> String in
             defer { uid += 1 }
             return "\(uid)"
         }
@@ -112,7 +111,7 @@ class SlidingDataSourceTests: XCTestCase {
             return "\(id)"
         }
 
-        let dataSource = SlidingDataSource(count: 10000, pageSize: 50) { (id) -> String in
+        let dataSource = SlidingDataSource(count: 10000, pageSize: 50) { (_) -> String in
             defer { uid += 1 }
             return "\(uid)"
         }
@@ -133,7 +132,7 @@ class SlidingDataSourceTests: XCTestCase {
         }
         expectedArray.append("test")
 
-        let dataSource = SlidingDataSource(count: 10000, pageSize: 50) { (id) -> String in
+        let dataSource = SlidingDataSource(count: 10000, pageSize: 50) { (_) -> String in
             defer { uid += 1 }
             return "\(uid)"
         }
@@ -143,7 +142,6 @@ class SlidingDataSourceTests: XCTestCase {
             dataSource.adjustWindow(focusPosition: 0, maxWindowSize: 200)
         }
         dataSource.insertItem("test", position: .bottom)
-
 
         while dataSource.hasMore() {
             dataSource.loadNext()
@@ -160,7 +158,7 @@ class SlidingDataSourceTests: XCTestCase {
         let expectedArray = (0..<52).reversed().map { (id) -> String in
             return "\(id)"
         }
-        let dataSource = SlidingDataSource(count: 52, pageSize: 50) { (id) -> String in
+        let dataSource = SlidingDataSource(count: 52, pageSize: 50) { (_) -> String in
             defer { uid += 1 }
             return "\(uid)"
         }

@@ -29,7 +29,6 @@ public final class LiveCameraCellPresenter {
     private typealias Class = LiveCameraCellPresenter
     public typealias AVAuthorizationStatusProvider = () -> AVAuthorizationStatus
 
-
     private let cellAppearance: LiveCameraCellAppearance
     private let authorizationStatusProvider: () -> AVAuthorizationStatus
     public init(cellAppearance: LiveCameraCellAppearance = LiveCameraCellAppearance.createDefaultAppearance(), authorizationStatusProvider: @escaping AVAuthorizationStatusProvider = LiveCameraCellPresenter.createDefaultCameraAuthorizationStatusProvider()) {
@@ -151,9 +150,9 @@ public final class LiveCameraCellPresenter {
     }
 
     func startCapturing() {
-        guard self.isCaptureAvailable, let _ = self.cell else { return }
+        guard self.isCaptureAvailable, self.cell != nil else { return }
 
-        self.captureSession.startCapturing() { [weak self] in
+        self.captureSession.startCapturing { [weak self] in
             self?.cell?.captureLayer = self?.captureSession.captureLayer
         }
     }
@@ -161,7 +160,7 @@ public final class LiveCameraCellPresenter {
     func stopCapturing() {
         guard self.isCaptureAvailable else { return }
 
-        self.captureSession.stopCapturing() { [weak self] in
+        self.captureSession.stopCapturing { [weak self] in
             self?.cell?.captureLayer = nil
         }
     }

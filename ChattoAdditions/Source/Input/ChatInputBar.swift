@@ -192,10 +192,13 @@ extension ChatInputBar {
     public func setAppearance(_ appearance: ChatInputBarAppearance) {
         self.textView.font = appearance.textInputAppearance.font
         self.textView.textColor = appearance.textInputAppearance.textColor
+        self.textView.tintColor = appearance.textInputAppearance.tintColor
         self.textView.textContainerInset = appearance.textInputAppearance.textInsets
         self.textView.setTextPlaceholderFont(appearance.textInputAppearance.placeholderFont)
         self.textView.setTextPlaceholderColor(appearance.textInputAppearance.placeholderColor)
         self.textView.setTextPlaceholder(appearance.textInputAppearance.placeholderText)
+        self.textView.layer.borderColor = appearance.textInputAppearance.borderColor.cgColor
+        self.textView.layer.borderWidth = appearance.textInputAppearance.borderWidth
         self.tabBarInterItemSpacing = appearance.tabBarAppearance.interItemSpacing
         self.tabBarContentInsets = appearance.tabBarAppearance.contentInsets
         self.sendButton.contentEdgeInsets = appearance.sendButtonAppearance.insets

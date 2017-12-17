@@ -54,7 +54,7 @@ final class ChatItemsDemoDecorator: ChatItemsDecoratorProtocol {
                 }
 
                 if let previousMessage = prev as? MessageModelProtocol {
-                    addTimeSeparator = calendar.compare(currentMessage.date, to: previousMessage.date, toGranularity: Calendar.Component.day) != ComparisonResult.orderedSame
+                    addTimeSeparator = !calendar.isDate(currentMessage.date, inSameDayAs: previousMessage.date)
                 } else {
                     addTimeSeparator = true
                 }
@@ -73,9 +73,14 @@ final class ChatItemsDemoDecorator: ChatItemsDecoratorProtocol {
                 }
             }
 
-            decoratedChatItems.append(DecoratedChatItem(
-                chatItem: chatItem,
-                decorationAttributes: ChatItemDecorationAttributes(bottomMargin: bottomMargin, showsTail: showsTail, canShowAvatar: showsTail))
+            decoratedChatItems.append(
+                DecoratedChatItem(
+                    chatItem: chatItem,
+                    decorationAttributes: ChatItemDecorationAttributes(bottomMargin: bottomMargin,
+                                                                       canShowTail: showsTail,
+                                                                       canShowAvatar: showsTail,
+                                                                       canShowFailedIcon: true)
+                )
             )
             decoratedChatItems.append(contentsOf: additionalItems)
         }

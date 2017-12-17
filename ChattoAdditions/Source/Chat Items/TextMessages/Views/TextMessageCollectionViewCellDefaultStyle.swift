@@ -23,6 +23,7 @@
 */
 
 import UIKit
+import Chatto
 
 open class TextMessageCollectionViewCellDefaultStyle: TextMessageCollectionViewCellStyleProtocol {
     typealias Class = TextMessageCollectionViewCellDefaultStyle
@@ -64,7 +65,6 @@ open class TextMessageCollectionViewCellDefaultStyle: TextMessageCollectionViewC
         }
     }
 
-
     public let bubbleImages: BubbleImages
     public let textStyle: TextStyle
     public let baseStyle: BaseMessageCollectionViewCellDefaultStyle
@@ -79,10 +79,10 @@ open class TextMessageCollectionViewCellDefaultStyle: TextMessageCollectionViewC
 
     lazy private var images: [ImageKey: UIImage] = {
         return [
-            .template(isIncoming: true, showsTail: true) : self.bubbleImages.incomingTail(),
-            .template(isIncoming: true, showsTail: false) : self.bubbleImages.incomingNoTail(),
-            .template(isIncoming: false, showsTail: true) : self.bubbleImages.outgoingTail(),
-            .template(isIncoming: false, showsTail: false) : self.bubbleImages.outgoingNoTail()
+            .template(isIncoming: true, showsTail: true): self.bubbleImages.incomingTail(),
+            .template(isIncoming: true, showsTail: false): self.bubbleImages.incomingNoTail(),
+            .template(isIncoming: false, showsTail: true): self.bubbleImages.outgoingTail(),
+            .template(isIncoming: false, showsTail: false): self.bubbleImages.outgoingNoTail()
         ]
     }()
 
@@ -148,14 +148,10 @@ open class TextMessageCollectionViewCellDefaultStyle: TextMessageCollectionViewC
         var hashValue: Int {
             switch self {
             case let .template(isIncoming: isIncoming, showsTail: showsTail):
-                return self.calculateHash(withHashValues: [isIncoming.hashValue, showsTail.hashValue])
+                return Chatto.bma_combine(hashes: [1 /*template*/, isIncoming.hashValue, showsTail.hashValue])
             case let .normal(isIncoming: isIncoming, status: status, showsTail: showsTail, isSelected: isSelected):
-                return self.calculateHash(withHashValues: [isIncoming.hashValue, status.hashValue, showsTail.hashValue, isSelected.hashValue])
+                return Chatto.bma_combine(hashes: [2 /*normal*/, isIncoming.hashValue, status.hashValue, showsTail.hashValue, isSelected.hashValue])
             }
-        }
-
-        private func calculateHash(withHashValues hashes: [Int]) -> Int {
-            return hashes.reduce(0, { 31 &* $0 &+ $1.hashValue })
         }
 
         static func == (lhs: TextMessageCollectionViewCellDefaultStyle.ImageKey, rhs: TextMessageCollectionViewCellDefaultStyle.ImageKey) -> Bool {

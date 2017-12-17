@@ -23,6 +23,7 @@
 */
 
 import UIKit
+import Chatto
 
 public protocol TextBubbleViewStyleProtocol {
     func bubbleImage(viewModel: TextMessageViewModelProtocol, isSelected: Bool) -> UIImage
@@ -104,7 +105,6 @@ public final class TextBubbleView: UIView, MaximumLayoutWidthSpecificable, Backg
         textView.bouncesZoom = false
         textView.showsHorizontalScrollIndicator = false
         textView.showsVerticalScrollIndicator = false
-        textView.layoutManager.allowsNonContiguousLayout = true
         textView.isExclusiveTouch = true
         textView.textContainer.lineFragmentPadding = 0
         return textView
@@ -122,7 +122,7 @@ public final class TextBubbleView: UIView, MaximumLayoutWidthSpecificable, Backg
             }
         }
         if animated {
-            UIView.animate(withDuration: self.animationDuration, animations: updateAndRefreshViews, completion: { (finished) -> Void in
+            UIView.animate(withDuration: self.animationDuration, animations: updateAndRefreshViews, completion: { (_) -> Void in
                 completion?()
             })
         } else {
@@ -138,7 +138,7 @@ public final class TextBubbleView: UIView, MaximumLayoutWidthSpecificable, Backg
         self.updateTextView()
         let bubbleImage = style.bubbleImage(viewModel: self.textMessageViewModel, isSelected: self.selected)
         let borderImage = style.bubbleImageBorder(viewModel: self.textMessageViewModel, isSelected: self.selected)
-        if self.bubbleImageView.image != bubbleImage { self.bubbleImageView.image = bubbleImage}
+        if self.bubbleImageView.image != bubbleImage { self.bubbleImageView.image = bubbleImage }
         if self.borderImageView.image != borderImage { self.borderImageView.image = borderImage }
     }
 
@@ -159,7 +159,7 @@ public final class TextBubbleView: UIView, MaximumLayoutWidthSpecificable, Backg
             self.textView.textColor = textColor
             self.textView.linkTextAttributes = [
                 NSForegroundColorAttributeName: textColor,
-                NSUnderlineStyleAttributeName : NSUnderlineStyle.styleSingle.rawValue
+                NSUnderlineStyleAttributeName: NSUnderlineStyle.styleSingle.rawValue
             ]
             needsToUpdateText = true
         }
@@ -180,7 +180,7 @@ public final class TextBubbleView: UIView, MaximumLayoutWidthSpecificable, Backg
         return self.calculateTextBubbleLayout(preferredMaxLayoutWidth: size.width).size
     }
 
-    // MARK:  Layout
+    // MARK: Layout
     public override func layoutSubviews() {
         super.layoutSubviews()
         let layout = self.calculateTextBubbleLayout(preferredMaxLayoutWidth: self.preferredMaxLayoutWidth)
@@ -214,7 +214,6 @@ public final class TextBubbleView: UIView, MaximumLayoutWidthSpecificable, Backg
     }
 }
 
-
 private final class TextBubbleLayoutModel {
     let layoutContext: LayoutContext
     var textFrame: CGRect = CGRect.zero
@@ -232,9 +231,7 @@ private final class TextBubbleLayoutModel {
         let preferredMaxLayoutWidth: CGFloat
 
         var hashValue: Int {
-            get {
-                return self.text.hashValue ^ self.textInsets.bma_hashValue ^ self.preferredMaxLayoutWidth.hashValue ^ self.font.hashValue
-            }
+            return Chatto.bma_combine(hashes: [self.text.hashValue, self.textInsets.bma_hashValue, self.preferredMaxLayoutWidth.hashValue, self.font.hashValue])
         }
 
         static func == (lhs: TextBubbleLayoutModel.LayoutContext, rhs: TextBubbleLayoutModel.LayoutContext) -> Bool {
@@ -278,7 +275,7 @@ private final class TextBubbleLayoutModel {
         // See https://github.com/badoo/Chatto/issues/129
         return NSTextStorage(string: self.layoutContext.text, attributes: [
             NSFontAttributeName: self.layoutContext.font,
-            "NSOriginalFont": self.layoutContext.font,
+            "NSOriginalFont": self.layoutContext.font
         ])
     }
 }

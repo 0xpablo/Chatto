@@ -100,7 +100,7 @@ open class PhotoBubbleView: UIView, MaximumLayoutWidthSpecificable, BackgroundSi
     }
 
     public private(set) var isUpdating: Bool = false
-    public func performBatchUpdates(_ updateClosure: @escaping () -> Void, animated: Bool, completion: (() ->())?) {
+    public func performBatchUpdates(_ updateClosure: @escaping () -> Void, animated: Bool, completion: (() -> Void)?) {
         self.isUpdating = true
         let updateAndRefreshViews = {
             updateClosure()
@@ -111,7 +111,7 @@ open class PhotoBubbleView: UIView, MaximumLayoutWidthSpecificable, BackgroundSi
             }
         }
         if animated {
-            UIView.animate(withDuration: self.animationDuration, animations: updateAndRefreshViews, completion: { (finished) -> Void in
+            UIView.animate(withDuration: self.animationDuration, animations: updateAndRefreshViews, completion: { (_) -> Void in
                 completion?()
             })
         } else {
@@ -122,7 +122,7 @@ open class PhotoBubbleView: UIView, MaximumLayoutWidthSpecificable, BackgroundSi
     open func updateViews() {
         if self.viewContext == .sizing { return }
         if isUpdating { return }
-        guard let _ = self.photoMessageViewModel, let _ = self.photoMessageStyle else { return }
+        guard self.photoMessageViewModel != nil, self.photoMessageStyle != nil else { return }
 
         self.updateProgressIndicator()
         self.updateImages()
@@ -178,7 +178,6 @@ open class PhotoBubbleView: UIView, MaximumLayoutWidthSpecificable, BackgroundSi
         self.imageView.layer.mask = UIImageView(image: self.photoMessageStyle.maskingImage(viewModel: self.photoMessageViewModel)).layer
     }
 
-
     // MARK: Layout
 
     open override func sizeThatFits(_ size: CGSize) -> CGSize {
@@ -209,7 +208,6 @@ open class PhotoBubbleView: UIView, MaximumLayoutWidthSpecificable, BackgroundSi
     }
 
 }
-
 
 private class PhotoBubbleLayoutModel {
     var photoFrame: CGRect = CGRect.zero

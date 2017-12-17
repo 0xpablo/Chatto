@@ -71,7 +71,7 @@ open class BaseMessageCollectionViewCell<BubbleViewType>: UICollectionViewCell, 
     open var viewContext: ViewContext = .normal
 
     public private(set) var isUpdating: Bool = false
-    open func performBatchUpdates(_ updateClosure: @escaping () -> Void, animated: Bool, completion: (() ->())?) {
+    open func performBatchUpdates(_ updateClosure: @escaping () -> Void, animated: Bool, completion: (() -> Void)?) {
         self.isUpdating = true
         let updateAndRefreshViews = {
             updateClosure()
@@ -82,7 +82,7 @@ open class BaseMessageCollectionViewCell<BubbleViewType>: UICollectionViewCell, 
             }
         }
         if animated {
-            UIView.animate(withDuration: self.animationDuration, animations: updateAndRefreshViews, completion: { (finished) -> Void in
+            UIView.animate(withDuration: self.animationDuration, animations: updateAndRefreshViews, completion: { (_) -> Void in
                 completion?()
             })
         } else {
@@ -92,7 +92,7 @@ open class BaseMessageCollectionViewCell<BubbleViewType>: UICollectionViewCell, 
 
     open var messageViewModel: MessageViewModelProtocol! {
         didSet {
-            updateViews()
+            self.updateViews()
         }
     }
 
@@ -104,6 +104,9 @@ open class BaseMessageCollectionViewCell<BubbleViewType>: UICollectionViewCell, 
             self.failedIconHighlighted = self.baseStyle.failedIconHighlighted
             self.updateViews()
         }
+    }
+    private var shouldShowFailedIcon: Bool {
+        return self.messageViewModel?.canShowFailedIcon == true && self.messageViewModel?.showsFailedIcon == true
     }
 
     override open var isSelected: Bool {
@@ -196,7 +199,8 @@ open class BaseMessageCollectionViewCell<BubbleViewType>: UICollectionViewCell, 
         if self.viewContext == .sizing { return }
         if self.isUpdating { return }
         guard let viewModel = self.messageViewModel, let style = self.baseStyle else { return }
-        if viewModel.showsFailedIcon {
+        self.bubbleView.isUserInteractionEnabled = viewModel.isUserInteractionEnabled
+        if self.shouldShowFailedIcon {
             self.failedButton.setImage(self.failedIcon, for: .normal)
             self.failedButton.setImage(self.failedIconHighlighted, for: .highlighted)
             self.failedButton.alpha = 1
@@ -204,11 +208,18 @@ open class BaseMessageCollectionViewCell<BubbleViewType>: UICollectionViewCell, 
             self.failedButton.alpha = 0
         }
         self.accessoryTimestampView.attributedText = style.attributedStringForDate(viewModel.date)
-        let avatarImageSize = baseStyle.avatarSize(viewModel: messageViewModel)
-        if avatarImageSize != CGSize.zero {
-            self.avatarView.image = self.messageViewModel.avatarImage.value
-        }
+        self.updateAvatarView(from: viewModel, with: style)
         self.setNeedsLayout()
+    }
+
+    private func updateAvatarView(from viewModel: MessageViewModelProtocol,
+                                  with style: BaseMessageCollectionViewCellStyleProtocol) {
+        self.avatarView.isHidden = !viewModel.showsAvatar
+
+        let avatarImageSize = style.avatarSize(viewModel: viewModel)
+        if avatarImageSize != .zero {
+            self.avatarView.image = viewModel.avatarImage.value
+        }
     }
 
     // MARK: layout
@@ -254,7 +265,7 @@ open class BaseMessageCollectionViewCell<BubbleViewType>: UICollectionViewCell, 
             maxContainerWidthPercentageForBubbleView: layoutConstants.maxContainerWidthPercentageForBubbleView,
             bubbleView: self.bubbleView,
             isIncoming: self.messageViewModel.isIncoming,
-            isFailed: self.messageViewModel.showsFailedIcon,
+            isFailed: self.shouldShowFailedIcon,
             avatarSize: baseStyle.avatarSize(viewModel: messageViewModel),
             avatarVerticalAlignment: baseStyle.avatarVerticalAlignment(viewModel: messageViewModel)
         )
@@ -263,10 +274,9 @@ open class BaseMessageCollectionViewCell<BubbleViewType>: UICollectionViewCell, 
         return layoutModel
     }
 
-
     // MARK: timestamp revealing
 
-    lazy var accessoryTimestampView = UILabel()
+    var accessoryTimestampView = UILabel()
 
     var offsetToRevealAccessoryView: CGFloat = 0 {
         didSet {
@@ -280,7 +290,6 @@ open class BaseMessageCollectionViewCell<BubbleViewType>: UICollectionViewCell, 
         let layoutConstants = baseStyle.layoutConstants(viewModel: messageViewModel)
         return self.accessoryTimestampView.intrinsicContentSize.width + layoutConstants.horizontalTimestampMargin
     }
-
 
     open func revealAccessoryView(withOffset offset: CGFloat, animated: Bool) {
         self.offsetToRevealAccessoryView = offset
@@ -299,7 +308,7 @@ open class BaseMessageCollectionViewCell<BubbleViewType>: UICollectionViewCell, 
             if animated {
                 UIView.animate(withDuration: self.animationDuration, animations: { () -> Void in
                     self.layoutIfNeeded()
-                    }, completion: { (finished) -> Void in
+                    }, completion: { (_) -> Void in
                         if offset == 0 {
                             self.removeAccessoryView()
                         }
@@ -353,7 +362,6 @@ struct BaseMessageLayoutModel {
     private (set) var avatarViewFrame = CGRect.zero
     private (set) var preferredMaxWidthForBubble: CGFloat = 0
 
-
     mutating func calculateLayout(parameters: BaseMessageLayoutModelParameters) {
         let containerWidth = parameters.containerWidth
         let isIncoming = parameters.isIncoming
@@ -367,7 +375,6 @@ struct BaseMessageLayoutModel {
         let preferredWidthForBubble = (containerWidth * parameters.maxContainerWidthPercentageForBubbleView).bma_round()
         let bubbleSize = bubbleView.sizeThatFits(CGSize(width: preferredWidthForBubble, height: .greatestFiniteMagnitude))
         let containerRect = CGRect(origin: CGPoint.zero, size: CGSize(width: containerWidth, height: bubbleSize.height))
-
 
         self.bubbleViewFrame = bubbleSize.bma_rect(inContainer: containerRect, xAlignament: .center, yAlignment: .center, dx: 0, dy: 0)
         self.failedViewFrame = failedButtonSize.bma_rect(inContainer: containerRect, xAlignament: .center, yAlignment: .center, dx: 0, dy: 0)

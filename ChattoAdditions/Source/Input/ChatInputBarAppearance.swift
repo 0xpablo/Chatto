@@ -43,6 +43,9 @@ public struct ChatInputBarAppearance {
     public struct TextInputAppearance {
         public var font = UIFont.systemFont(ofSize: 12)
         public var textColor = UIColor.black
+        public var tintColor: UIColor?
+        public var borderColor = UIColor.clear
+        public var borderWidth: CGFloat = 0
         public var placeholderFont = UIFont.systemFont(ofSize: 12)
         public var placeholderColor = UIColor.gray
         public var placeholderText = ""
@@ -56,7 +59,6 @@ public struct ChatInputBarAppearance {
     public init() {}
 }
 
-
 // Workaround for SR-2223
 public struct UIControlStateWrapper: Hashable {
 
@@ -67,7 +69,7 @@ public struct UIControlStateWrapper: Hashable {
     }
 
     public var hashValue: Int {
-        return Int(self.controlState.rawValue)
+        return self.controlState.rawValue.hashValue
     }
 }
 

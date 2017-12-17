@@ -29,16 +29,17 @@ class ReadOnlyOrderedDictionaryTests: XCTestCase {
 
     var orderedDictionary: ReadOnlyOrderedDictionary<FakeChatItem>!
     override func setUp() {
+        super.setUp()
         let items = [
             FakeChatItem(uid: "3", type: "type3"),
             FakeChatItem(uid: "1", type: "type1"),
-            FakeChatItem(uid: "2", type: "type2"),
+            FakeChatItem(uid: "2", type: "type2")
         ]
         self.orderedDictionary = ReadOnlyOrderedDictionary<FakeChatItem>(items: items)
     }
 
     func testThat_MapsCorrectly() {
-        XCTAssertEqual(self.orderedDictionary.map { $0.uid}, ["3", "1", "2"])
+        XCTAssertEqual(self.orderedDictionary.map { $0.uid }, ["3", "1", "2"])
     }
 
     func testThat_NumberOfItemsIsCorrect() {
