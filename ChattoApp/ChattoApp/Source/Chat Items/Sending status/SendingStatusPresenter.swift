@@ -27,7 +27,7 @@ import Chatto
 import ChattoAdditions
 
 // This is a dirty implementation that shows what's needed to add a new type of element
-// @see ChatItemsDemoDecorator
+// @see DemoChatItemsDecorator
 
 class SendingStatusModel: ChatItemProtocol {
     let uid: String
@@ -85,8 +85,8 @@ class SendingStatusPresenter: ChatItemPresenterProtocol {
         }
 
         let attrs = [
-            NSFontAttributeName : UIFont.systemFont(ofSize: 10.0),
-            NSForegroundColorAttributeName: self.statusModel.status == .failed ? UIColor.red : UIColor.black
+            NSAttributedStringKey.font: UIFont.systemFont(ofSize: 10.0),
+            NSAttributedStringKey.foregroundColor: self.statusModel.status == .failed ? UIColor.red : UIColor.black
         ]
         statusCell.text = NSAttributedString(
             string: self.statusText(),

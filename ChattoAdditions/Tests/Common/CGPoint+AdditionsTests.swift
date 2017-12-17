@@ -22,32 +22,30 @@
  THE SOFTWARE.
 */
 
-import Foundation
+import XCTest
 import ChattoAdditions
 
-class DemoPhotoMessageHandler: BaseMessageInteractionHandlerProtocol {
-    private let baseHandler: BaseMessageHandler
-    init (baseHandler: BaseMessageHandler) {
-        self.baseHandler = baseHandler
+class CGPoint_AdditionsTests: XCTestCase {
+    func testThat_WhenOffsetIsPositive_ItOffsetsCorrectly() {
+        let point = CGPoint(x: 0, y: 0)
+        let offset: CGFloat = 1
+        let resultPoint = point.bma_offsetBy(dx: offset, dy: offset)
+        let expectedPoint = CGPoint(x: 1, y: 1)
+        XCTAssertEqual(resultPoint, expectedPoint)
     }
 
-    func userDidTapOnFailIcon(viewModel: DemoPhotoMessageViewModel, failIconView: UIView) {
-        self.baseHandler.userDidTapOnFailIcon(viewModel: viewModel)
+    func testThat_WhenOffsetIsNegative_ItOffsetsCorrectly() {
+        let point = CGPoint(x: 0, y: 0)
+        let offset: CGFloat = -1
+        let resultPoint = point.bma_offsetBy(dx: offset, dy: offset)
+        let expectedPoint = CGPoint(x: -1, y: -1)
+        XCTAssertEqual(resultPoint, expectedPoint)
     }
 
-    func userDidTapOnAvatar(viewModel: DemoPhotoMessageViewModel) {
-        self.baseHandler.userDidTapOnAvatar(viewModel: viewModel)
-    }
-
-    func userDidTapOnBubble(viewModel: DemoPhotoMessageViewModel) {
-        self.baseHandler.userDidTapOnBubble(viewModel: viewModel)
-    }
-
-    func userDidBeginLongPressOnBubble(viewModel: DemoPhotoMessageViewModel) {
-        self.baseHandler.userDidBeginLongPressOnBubble(viewModel: viewModel)
-    }
-
-    func userDidEndLongPressOnBubble(viewModel: DemoPhotoMessageViewModel) {
-        self.baseHandler.userDidEndLongPressOnBubble(viewModel: viewModel)
+    func testThat_WhenOffsetIsZero_ItOffsetsCorrectly() {
+        let point = CGPoint(x: 0, y: 0)
+        let offset: CGFloat = 0
+        let resultPoint = point.bma_offsetBy(dx: offset, dy: offset)
+        XCTAssertEqual(resultPoint, point)
     }
 }

@@ -22,32 +22,24 @@
  THE SOFTWARE.
 */
 
-import Foundation
-import ChattoAdditions
+import UIKit
 
-class DemoTextMessageHandler: BaseMessageInteractionHandlerProtocol {
-    private let baseHandler: BaseMessageHandler
-    init (baseHandler: BaseMessageHandler) {
-        self.baseHandler = baseHandler
+public extension UIColor {
+    static func bma_color(rgb: Int) -> UIColor {
+        return UIColor(red: CGFloat((rgb & 0xFF0000) >> 16) / 255.0, green: CGFloat((rgb & 0xFF00) >> 8) / 255.0, blue: CGFloat((rgb & 0xFF)) / 255.0, alpha: 1.0)
     }
 
-    func userDidTapOnFailIcon(viewModel: DemoTextMessageViewModel, failIconView: UIView) {
-        self.baseHandler.userDidTapOnFailIcon(viewModel: viewModel)
-    }
-
-    func userDidTapOnAvatar(viewModel: DemoTextMessageViewModel) {
-        self.baseHandler.userDidTapOnAvatar(viewModel: viewModel)
-    }
-
-    func userDidTapOnBubble(viewModel: DemoTextMessageViewModel) {
-        self.baseHandler.userDidTapOnBubble(viewModel: viewModel)
-    }
-
-    func userDidBeginLongPressOnBubble(viewModel: DemoTextMessageViewModel) {
-        self.baseHandler.userDidBeginLongPressOnBubble(viewModel: viewModel)
-    }
-
-    func userDidEndLongPressOnBubble(viewModel: DemoTextMessageViewModel) {
-        self.baseHandler.userDidEndLongPressOnBubble(viewModel: viewModel)
+    public func bma_blendWithColor(_ color: UIColor) -> UIColor {
+        var r1: CGFloat = 0, r2: CGFloat = 0
+        var g1: CGFloat = 0, g2: CGFloat = 0
+        var b1: CGFloat = 0, b2: CGFloat = 0
+        var a1: CGFloat = 0, a2: CGFloat = 0
+        self.getRed(&r1, green: &g1, blue: &b1, alpha: &a1)
+        color.getRed(&r2, green: &g2, blue: &b2, alpha: &a2)
+        let alpha = a2, beta = 1 - alpha
+        let r = r1 * beta + r2 * alpha
+        let g = g1 * beta + g2 * alpha
+        let b = b1 * beta + b2 * alpha
+        return UIColor(red: r, green: g, blue: b, alpha: 1)
     }
 }
